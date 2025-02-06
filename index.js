@@ -128,6 +128,25 @@ const authenticateUser = (req, res, next) => {
     }
 };
 
+// User Profile Route
+app.get("/profile", authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findOne({ userId: req.user.userId });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            fullname: user.fullname,
+            accountNumber: user.accountNumber,
+            branch: user.branch,
+            balance: user.balance
+        });
+    } catch (error) {
+        console.error("Profile fetch error:", error);
+        res.status(500).json({ message: "Error fetching profile" });
+    }
+});
+
 // Improved deposit route with transaction recording
 app.post("/deposit", authenticateUser, async (req, res) => {
     const { amount } = req.body;
@@ -279,6 +298,7 @@ app.get("/transactions", authenticateUser, async (req, res) => {
         res.status(500).json({ message: "Error fetching transactions", error: error.message });
     }
 });
+
 
 
 
